@@ -5,12 +5,14 @@ import { hash } from "bcryptjs"
 
 interface CreateUserRequest {
   name: string
+  username: string
   email: string
   password: string
 }
 
 interface User {
   id: string
+  username: string
   name: string
   email: string
 }
@@ -22,11 +24,17 @@ type CreateUserResponse =
 export class CreateUserUseCase {
   async execute({
     name,
+    username,
     email,
     password
   }: CreateUserRequest): Promise<CreateUserResponse> {
-    const doesUserExist = await prisma.user.findUnique({
-      where: { email }
+    const doesUserExist = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email },
+          { username }
+        ]
+      }
     })
 
     if (doesUserExist) {
@@ -38,6 +46,7 @@ export class CreateUserUseCase {
     const user = await prisma.user.create({
       data: {
         name,
+        username,
         email,
         password_hash
       }
@@ -47,6 +56,7 @@ export class CreateUserUseCase {
       ok: true,
       user: {
         id: user.id,
+        username: user.username,
         name: user.name,
         email: user.email
       }
