@@ -11,6 +11,7 @@ model User {
   id String @id @default(uuid())
 
   name          String
+  username      String @unique
   email         String @unique
   password_hash String
 
@@ -48,11 +49,11 @@ model UserCompany {
 
 model InviteCompany {
   id        String @id @default(uuid())
+  username  String
   companyId String
-  userId    String
   status    String @default("pending")
 
-  user    User    @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [username], references: [username])
   company Company @relation(fields: [companyId], references: [id])
 
   @@map("invites_companies")

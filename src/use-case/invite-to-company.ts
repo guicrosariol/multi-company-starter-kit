@@ -4,7 +4,7 @@ import { prisma } from "../lib/prisma"
 
 interface InviteToCompanyRequest {
   companyId: string
-  userId: string
+  username: string
 }
 
 type InviteToCompanyResponse =
@@ -13,11 +13,11 @@ type InviteToCompanyResponse =
 
 export class InviteToCompanyUseCase {
   async execute({
-    userId,
+    username,
     companyId
   }: InviteToCompanyRequest): Promise<InviteToCompanyResponse> {
     const user = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { username }
     })
 
     if (!user) {
@@ -35,7 +35,7 @@ export class InviteToCompanyUseCase {
     await prisma.inviteCompany.create({
       data: {
         companyId,
-        userId,
+        username
       }
     })
 
