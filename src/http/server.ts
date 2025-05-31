@@ -1,7 +1,10 @@
 import fastify from "fastify";
 import { env } from "../env";
+import { appRoutes } from "./routes";
 
 const app = fastify()
+
+app.register(appRoutes)
 
 app.listen({
   port: env.PORT
