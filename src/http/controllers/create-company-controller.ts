@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { CreateCompanyUseCase } from "../../user-case/create-company";
+import { CreateCompanyUseCase } from "../../use-case/create-company";
 
 export async function createCompanyController(request: FastifyRequest, reply: FastifyReply) {
   const requestSchema = z.object({
@@ -13,9 +13,9 @@ export async function createCompanyController(request: FastifyRequest, reply: Fa
 
   try {
     const result = await createCompanyUseCase.execute({
-      ownerId: 'example', //TODO:
+      ownerId: request.user.id,
       cnpj,
-    })
+    }) 
 
     if (!result.ok) {
       return reply.status(result.error.statusCode).send({ message: result.error.message })

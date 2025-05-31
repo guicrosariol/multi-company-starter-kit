@@ -14,8 +14,9 @@ model User {
   email         String @unique
   password_hash String
 
-  UserCompany UserCompany[]
-  Company     Company[]
+  UserCompany   UserCompany[]
+  Company       Company[]
+  InviteCompany InviteCompany[]
 
   @@map("users")
 }
@@ -28,7 +29,8 @@ model Company {
 
   user User @relation(fields: [ownerId], references: [id])
 
-  UserCompany UserCompany[]
+  UserCompany   UserCompany[]
+  InviteCompany InviteCompany[]
 
   @@map("companies")
 }
@@ -42,4 +44,16 @@ model UserCompany {
   company Company @relation(fields: [companyId], references: [id])
 
   @@map("user_companies")
+}
+
+model InviteCompany {
+  id        String @id @default(uuid())
+  companyId String
+  userId    String
+  status    String @default("pending")
+
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("invites_companies")
 }

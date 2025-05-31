@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { CreateUserUseCase } from "../../user-case/create-user";
+import { CreateUserUseCase } from "../../use-case/create-user";
 import { z } from "zod";
 
 export async function createUserController(request: FastifyRequest, reply: FastifyReply) {
