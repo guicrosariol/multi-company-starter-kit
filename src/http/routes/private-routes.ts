@@ -3,7 +3,5 @@ import { createCompanyController } from "../controllers/create-company-controlle
 import { verifyJwt } from "../utils/verify-jwt";
 
 export function privateRoutes(app: FastifyInstance) {
-  app.post('/company', {
-    onRequest: [verifyJwt]
-  }, createCompanyController)
+  app.post('/company', { onRequest: [verifyJwt] }, createCompanyController)
 }

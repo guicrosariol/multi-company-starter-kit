@@ -25,8 +25,10 @@ model User {
 model Company {
   id String @id @default(uuid())
 
-  cnpj    String @unique
-  ownerId String
+  cnpj       String @unique
+  ownerId    String
+  max_user   Int
+  count_user Int
 
   user User @relation(fields: [ownerId], references: [id])
 
@@ -48,12 +50,13 @@ model UserCompany {
 }
 
 model InviteCompany {
-  id        String @id @default(uuid())
-  username  String
-  companyId String
-  status    String @default("pending")
+  id         String   @id @default(uuid())
+  username   String?
+  companyId  String
+  status     String   @default("pending")
+  created_at DateTime @default(now())
 
-  user    User    @relation(fields: [username], references: [username])
+  user    User?   @relation(fields: [username], references: [username])
   company Company @relation(fields: [companyId], references: [id])
 
   @@map("invites_companies")

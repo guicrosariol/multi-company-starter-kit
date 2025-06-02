@@ -1,10 +1,11 @@
 import type { ErrorType } from "../errors/@type"
+import { AlreadyExist } from "../errors/already-exist-error"
 import { NotFoundError } from "../errors/not-found-error"
 import { prisma } from "../lib/prisma"
 
 interface InviteToCompanyRequest {
   companyId: string
-  username: string
+  username?: string
 }
 
 type InviteToCompanyResponse =
@@ -16,29 +17,35 @@ export class InviteToCompanyUseCase {
     username,
     companyId
   }: InviteToCompanyRequest): Promise<InviteToCompanyResponse> {
-    const user = await prisma.user.findUnique({
-      where: { username }
-    })
-
-    if (!user) {
-      return { ok: false, error: NotFoundError() }
-    }
-
     const company = await prisma.company.findUnique({
       where: { id: companyId }
-    })
+    });
 
     if (!company) {
-      return { ok: false, error: NotFoundError() }
+      return { ok: false, error: NotFoundError() };
+    }
+
+    if (company.count_user >= company.max_user) {
+      return { ok: false, error: AlreadyExist() };
+    }
+
+    if (username) {
+      const user = await prisma.user.findUnique({
+        where: { username }
+      });
+
+      if (!user) {
+        return { ok: false, error: NotFoundError() };
+      }
     }
 
     await prisma.inviteCompany.create({
       data: {
         companyId,
-        username
+        username: username ?? null
       }
-    })
+    });
 
-    return { ok: true }
+    return { ok: true };
   }
 }

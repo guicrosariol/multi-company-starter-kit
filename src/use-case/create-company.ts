@@ -47,7 +47,9 @@ export class CreateCompanyUseCase {
     const company = await prisma.company.create({
       data: {
         ownerId,
-        cnpj
+        cnpj,
+        max_user: 1,
+        count_user: 1
       }
     })
 
