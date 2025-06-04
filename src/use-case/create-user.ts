@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma"
-import { AlreadyExist } from "../errors/already-exist-error"
 import type { ErrorType } from "../errors/@type"
 import { hash } from "bcryptjs"
+import { alreadyExists } from "../errors/already-exist-error"
 
 interface CreateUserRequest {
   name: string
@@ -38,7 +38,7 @@ export class CreateUserUseCase {
     })
 
     if (doesUserExist) {
-      return { ok: false, error: AlreadyExist() }
+      return { ok: false, error: alreadyExists() }
     }
 
     const password_hash = await hash(password, 6)
@@ -48,7 +48,9 @@ export class CreateUserUseCase {
         name,
         username,
         email,
-        password_hash
+        password_hash,
+        max_companies: 0,
+        count_companies: 0
       }
     });
 

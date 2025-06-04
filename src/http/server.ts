@@ -11,5 +11,5 @@ app.listen({
   port: env.PORT
 }).then(() => {
   
-  console.log('Server is running! 🚀', env.PORT, createJwt({userId: "8184791e-d3a9-46cc-94ce-3b41eb9738aa"}));
+  console.log('Server is running! 🚀', env.PORT, createJwt({userId: "77924552-227c-420f-a3f5-dd85fcde1e7d"}));
 })

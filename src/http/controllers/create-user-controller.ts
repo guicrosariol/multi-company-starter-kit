@@ -4,17 +4,18 @@ import { z } from "zod";
 
 export async function createUserController(request: FastifyRequest, reply: FastifyReply) {
   const requestSchema = z.object({
+    username: z.string().min(4),
     name: z.string(),
     email: z.string().email(),
     password: z.string().min(6)
   })
 
-  const { name, email, password } = requestSchema.parse(request.body)
+  const { username, name, email, password } = requestSchema.parse(request.body)
 
   const createUserUserCase = new CreateUserUseCase()
 
   try {
-    const result = await createUserUserCase.execute({ name, email, password });
+    const result = await createUserUserCase.execute({ name, email, password, username });
 
     if (!result.ok) {
       return reply.status(result.error.statusCode).send({ message: result.error.message });

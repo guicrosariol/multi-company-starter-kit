@@ -1,4 +1,5 @@
 interface AcceptInviteCompanyRequest {
+  inviteId?: string
   userId: string
   companyId: string
 }
@@ -6,7 +7,11 @@ interface AcceptInviteCompanyRequest {
 type AcceptInviteCompanyResponse = any
 
 export class AcceptInviteCompanyUseCase {
-  execute({ }: AcceptInviteCompanyRequest): AcceptInviteCompanyResponse {
-    
+  execute({
+    inviteId,
+    companyId,
+    userId
+  }: AcceptInviteCompanyRequest): AcceptInviteCompanyResponse {
+
   }
 }

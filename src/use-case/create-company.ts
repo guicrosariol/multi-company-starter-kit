@@ -1,6 +1,7 @@
 import type { ErrorType } from "../errors/@type"
-import { AlreadyExist } from "../errors/already-exist-error"
-import { NotFoundError } from "../errors/not-found-error"
+import { alreadyExists } from "../errors/already-exist-error"
+import { limitExceededError } from "../errors/limit-exceeded-error"
+import { notFoundError } from "../errors/not-found-error"
 import { prisma } from "../lib/prisma"
 
 interface CreateCompanyRequest {
@@ -24,14 +25,18 @@ export class CreateCompanyUseCase {
     ownerId,
     cnpj
   }: CreateCompanyRequest): Promise<CreateCompanyResponse> {
-    const doesUserExist = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: ownerId
       }
     })
 
-    if (!doesUserExist) {
-      return { ok: false, error: NotFoundError('Owner not found!') }
+    if (!user) {
+      return { ok: false, error: notFoundError('Owner not found!') }
+    }
+
+    if (user.max_companies <= user.count_companies) {
+      return { ok: false, error: limitExceededError() }
     }
 
     const doesCompanyExist = await prisma.company.findUnique({
@@ -41,7 +46,7 @@ export class CreateCompanyUseCase {
     })
 
     if (doesCompanyExist) {
-      return { ok: false, error: AlreadyExist('Company already exist!') }
+      return { ok: false, error: alreadyExists('Company already exist!') }
     }
 
     const company = await prisma.company.create({

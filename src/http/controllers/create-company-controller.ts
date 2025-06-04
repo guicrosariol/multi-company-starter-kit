@@ -15,7 +15,7 @@ export async function createCompanyController(request: FastifyRequest, reply: Fa
     const result = await createCompanyUseCase.execute({
       ownerId: request.user.id,
       cnpj,
-    }) 
+    })
 
     if (!result.ok) {
       return reply.status(result.error.statusCode).send({ message: result.error.message })
@@ -23,6 +23,6 @@ export async function createCompanyController(request: FastifyRequest, reply: Fa
 
     return reply.status(201).send({ result: result.company })
   } catch (err) {
-    return reply.status(400).send(err)
+    return reply.status(400).send({ message: err })
   }
 }

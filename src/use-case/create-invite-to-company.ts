@@ -1,32 +1,34 @@
 import type { ErrorType } from "../errors/@type"
-import { AlreadyExist } from "../errors/already-exist-error"
-import { NotFoundError } from "../errors/not-found-error"
+import { alreadyExists } from "../errors/already-exist-error"
+import { limitExceededError } from "../errors/limit-exceeded-error"
+import { notFoundError } from "../errors/not-found-error"
+import { userAlreadyHasAccessError } from "../errors/user-already-has-access-error"
 import { prisma } from "../lib/prisma"
 
-interface InviteToCompanyRequest {
+interface CreateInviteToCompanyRequest {
   companyId: string
   username?: string
 }
 
-type InviteToCompanyResponse =
+type CreateInviteToCompanyResponse =
   { ok: true }
   | { ok: false, error: ErrorType }
 
-export class InviteToCompanyUseCase {
+export class CreateInviteToCompanyUseCase {
   async execute({
     username,
     companyId
-  }: InviteToCompanyRequest): Promise<InviteToCompanyResponse> {
+  }: CreateInviteToCompanyRequest): Promise<CreateInviteToCompanyResponse> {
     const company = await prisma.company.findUnique({
       where: { id: companyId }
     });
 
     if (!company) {
-      return { ok: false, error: NotFoundError() };
+      return { ok: false, error: notFoundError() };
     }
 
     if (company.count_user >= company.max_user) {
-      return { ok: false, error: AlreadyExist() };
+      return { ok: false, error: limitExceededError() };
     }
 
     if (username) {
@@ -35,7 +37,29 @@ export class InviteToCompanyUseCase {
       });
 
       if (!user) {
-        return { ok: false, error: NotFoundError() };
+        return { ok: false, error: notFoundError('User not found!') };
+      }
+
+      const thisUserIsOwner = await prisma.company.findFirst({
+        where: {
+          id: companyId,
+          ownerId: user.id
+        }
+      })
+
+      if (thisUserIsOwner) {
+        return { ok: false, error: userAlreadyHasAccessError() }
+      }
+
+      const doesInviteAlreadyExist = await prisma.inviteCompany.findFirst({
+        where: {
+          companyId,
+          username
+        }
+      })
+
+      if (doesInviteAlreadyExist) {
+        return { ok: false, error: alreadyExists('Invite already exist!') }
       }
     }
 

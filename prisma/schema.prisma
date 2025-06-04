@@ -10,10 +10,12 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  name          String
-  username      String @unique
-  email         String @unique
-  password_hash String
+  name            String
+  username        String  @unique
+  email           String  @unique
+  password_hash   String
+  max_companies   Decimal @default(0)
+  count_companies Decimal @default(0)
 
   UserCompany   UserCompany[]
   Company       Company[]
@@ -59,5 +61,6 @@ model InviteCompany {
   user    User?   @relation(fields: [username], references: [username])
   company Company @relation(fields: [companyId], references: [id])
 
+  @@unique([username, companyId])
   @@map("invites_companies")
 }
