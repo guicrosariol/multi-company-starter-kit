@@ -24,10 +24,23 @@ export class CreateInviteToCompanyUseCase {
     });
 
     if (!company) {
-      return { ok: false, error: notFoundError() };
+      return { ok: false, error: notFoundError('Company not found!') };
     }
 
     if (company.count_user >= company.max_user) {
+      return { ok: false, error: limitExceededError() };
+    }
+
+    const pendingInvites = await prisma.inviteCompany.count({
+      where: {
+        companyId,
+        status: 'pending' 
+      }
+    })
+    
+    const totalExpectedUsers = company.count_user + pendingInvites;
+    
+    if (totalExpectedUsers >= company.max_user) {
       return { ok: false, error: limitExceededError() };
     }
 
@@ -40,14 +53,14 @@ export class CreateInviteToCompanyUseCase {
         return { ok: false, error: notFoundError('User not found!') };
       }
 
-      const thisUserIsOwner = await prisma.company.findFirst({
+      const thisUserAlreadyHasAccess = await prisma.userCompany.findFirst({
         where: {
-          id: companyId,
-          ownerId: user.id
+          companyId,
+          userId: user.id
         }
       })
 
-      if (thisUserIsOwner) {
+      if (thisUserAlreadyHasAccess) {
         return { ok: false, error: userAlreadyHasAccessError() }
       }
 
@@ -59,7 +72,7 @@ export class CreateInviteToCompanyUseCase {
       })
 
       if (doesInviteAlreadyExist) {
-        return { ok: false, error: alreadyExists('Invite already exist!') }
+        return { ok: false, error: alreadyExists('Invite already exists!') }
       }
     }
 

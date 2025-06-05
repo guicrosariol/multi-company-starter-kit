@@ -48,6 +48,7 @@ model UserCompany {
   user    User    @relation(fields: [userId], references: [id])
   company Company @relation(fields: [companyId], references: [id])
 
+  @@unique([userId, companyId])
   @@map("user_companies")
 }
 

@@ -58,6 +58,13 @@ export class CreateCompanyUseCase {
       }
     })
 
+    await prisma.userCompany.create({
+      data: {
+        companyId: company.id,
+        userId: ownerId
+      }
+    })
+
     return { ok: true, company }
   }
 }

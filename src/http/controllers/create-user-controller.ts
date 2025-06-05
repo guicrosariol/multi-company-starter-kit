@@ -21,7 +21,7 @@ export async function createUserController(request: FastifyRequest, reply: Fasti
       return reply.status(result.error.statusCode).send({ message: result.error.message });
     }
 
-    return reply.status(201).send({ user: result.user });
+    return reply.status(201).send({ result: result.user });
   } catch (err) {
     return reply.status(400).send({ message: err })
   }
