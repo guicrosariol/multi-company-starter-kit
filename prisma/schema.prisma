@@ -11,11 +11,11 @@ model User {
   id String @id @default(uuid())
 
   name            String
-  username        String  @unique
-  email           String  @unique
+  username        String @unique
+  email           String @unique
   password_hash   String
-  max_companies   Decimal @default(0)
-  count_companies Decimal @default(0)
+  max_companies   Int    @default(0)
+  count_companies Int    @default(0)
 
   UserCompany   UserCompany[]
   Company       Company[]
@@ -28,11 +28,11 @@ model Company {
   id String @id @default(uuid())
 
   cnpj       String @unique
-  ownerId    String
+  adminId    String
   max_user   Int
   count_user Int
 
-  user User @relation(fields: [ownerId], references: [id])
+  user User @relation(fields: [adminId], references: [id])
 
   UserCompany   UserCompany[]
   InviteCompany InviteCompany[]
@@ -40,10 +40,16 @@ model Company {
   @@map("companies")
 }
 
+enum Role {
+  admin
+  member
+}
+
 model UserCompany {
   id        Int    @id @default(autoincrement())
   userId    String
   companyId String
+  role      Role
 
   user    User    @relation(fields: [userId], references: [id])
   company Company @relation(fields: [companyId], references: [id])
@@ -52,12 +58,19 @@ model UserCompany {
   @@map("user_companies")
 }
 
+enum InviteStatus {
+  pending
+  accepted
+  rejected
+}
+
 model InviteCompany {
-  id         String   @id @default(uuid())
+  id         String       @id @default(uuid())
   username   String?
   companyId  String
-  status     String   @default("pending")
-  created_at DateTime @default(now())
+  status     InviteStatus @default(pending)
+  created_at DateTime     @default(now())
+  expires_at DateTime
 
   user    User?   @relation(fields: [username], references: [username])
   company Company @relation(fields: [companyId], references: [id])

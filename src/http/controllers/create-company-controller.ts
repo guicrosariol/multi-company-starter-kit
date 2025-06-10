@@ -13,7 +13,7 @@ export async function createCompanyController(request: FastifyRequest, reply: Fa
 
   try {
     const result = await createCompanyUseCase.execute({
-      ownerId: request.user.id,
+      adminId: request.user.id,
       cnpj,
     })
 
