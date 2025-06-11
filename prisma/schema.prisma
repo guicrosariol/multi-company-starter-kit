@@ -6,3 +6,73 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id String @id @default(uuid())
+
+  name          String
+  username      String @unique
+  email         String @unique
+  password_hash String
+  max_companies Int    @default(0)
+
+  UserCompany   UserCompany[]
+  Company       Company[]
+  InviteCompany InviteCompany[]
+
+  @@map("users")
+}
+
+model Company {
+  id String @id @default(uuid())
+
+  cnpj     String @unique
+  adminId  String
+  max_user Int
+
+  user User @relation(fields: [adminId], references: [id])
+
+  UserCompany   UserCompany[]
+  InviteCompany InviteCompany[]
+
+  @@map("companies")
+}
+
+enum Role {
+  admin
+  member
+}
+
+model UserCompany {
+  id        Int    @id @default(autoincrement())
+  userId    String
+  companyId String
+  role      Role
+
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+  @@map("user_companies")
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  rejected
+  expired
+}
+
+model InviteCompany {
+  id         String       @id @default(uuid())
+  username   String?
+  companyId  String
+  status     InviteStatus @default(pending)
+  created_at DateTime     @default(now())
+  expires_at DateTime
+
+  user    User?   @relation(fields: [username], references: [username])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("invites_companies")
+}
