@@ -50,7 +50,6 @@ export class CreateUserUseCase {
         email,
         password_hash,
         max_companies: 0,
-        count_companies: 0
       }
     });
 

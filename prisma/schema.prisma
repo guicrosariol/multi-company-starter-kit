@@ -10,12 +10,11 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  name            String
-  username        String @unique
-  email           String @unique
-  password_hash   String
-  max_companies   Int    @default(0)
-  count_companies Int    @default(0)
+  name          String
+  username      String @unique
+  email         String @unique
+  password_hash String
+  max_companies Int    @default(0)
 
   UserCompany   UserCompany[]
   Company       Company[]
@@ -27,10 +26,9 @@ model User {
 model Company {
   id String @id @default(uuid())
 
-  cnpj       String @unique
-  adminId    String
-  max_user   Int
-  count_user Int
+  cnpj     String @unique
+  adminId  String
+  max_user Int
 
   user User @relation(fields: [adminId], references: [id])
 
@@ -62,6 +60,7 @@ enum InviteStatus {
   pending
   accepted
   rejected
+  expired
 }
 
 model InviteCompany {
@@ -75,6 +74,5 @@ model InviteCompany {
   user    User?   @relation(fields: [username], references: [username])
   company Company @relation(fields: [companyId], references: [id])
 
-  @@unique([username, companyId])
   @@map("invites_companies")
 }

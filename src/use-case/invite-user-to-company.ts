@@ -71,7 +71,13 @@ export class InviteUserToCompanyUseCase {
       }
     })
 
-    const totalUsersAndInvites = pendingInvites + company.count_user
+    const countUserCompanies = await prisma.company.count({
+      where: {
+        adminId
+      }
+    })
+
+    const totalUsersAndInvites = pendingInvites + countUserCompanies
 
     if (totalUsersAndInvites >= company.max_user) {
       return { ok: false, error: limitExceededError() }
@@ -81,7 +87,7 @@ export class InviteUserToCompanyUseCase {
       where: {
         companyId,
         username,
-        status: { not: "rejected" }
+        status: { notIn: ["rejected", "expired"] }
       }
     })
 

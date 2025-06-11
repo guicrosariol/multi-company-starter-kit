@@ -4,7 +4,7 @@ import { CreatePublicInviteToCompanyUseCase } from "../../use-case/create-public
 
 export async function createPublicInviteToCompanyController(request: FastifyRequest, reply: FastifyReply) {
   const requestSchema = z.object({
-    companyId: z.string()
+    companyId: z.string().uuid()
   })
 
   const { companyId } = requestSchema.parse(request.body)

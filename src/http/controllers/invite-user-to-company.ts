@@ -5,7 +5,7 @@ import { InviteUserToCompanyUseCase } from "../../use-case/invite-user-to-compan
 export async function inviteUserToCompanyController(request: FastifyRequest, reply: FastifyReply) {
   const requestSchema = z.object({
     username: z.string(),
-    companyId: z.string()
+    companyId: z.string().uuid()
   })
 
   const { username, companyId } = requestSchema.parse(request.body)

@@ -32,11 +32,7 @@ export class CreateCompanyUseCase {
     })
 
     if (!user) {
-      return { ok: false, error: notFoundError('Owner not found!') }
-    }
-
-    if (user.max_companies <= user.count_companies) {
-      return { ok: false, error: limitExceededError() }
+      return { ok: false, error: notFoundError('Admin not found!') }
     }
 
     const doesCompanyExist = await prisma.company.findUnique({
@@ -49,24 +45,24 @@ export class CreateCompanyUseCase {
       return { ok: false, error: alreadyExists('Company already exist!') }
     }
 
+    const countUserCompanies = await prisma.company.count({
+      where: {
+        adminId
+      }
+    })
+
+    if (user.max_companies <= countUserCompanies) {
+      return { ok: false, error: limitExceededError() }
+    }
+
     const company = await prisma.company.create({
       data: {
         adminId,
         cnpj,
         max_user: 1,
-        count_user: 1
       }
     })
-
-    await prisma.user.update({
-      where: {
-        id: adminId
-      },
-      data: {
-        count_companies: { increment: 1 }
-      }
-    })
-
+    
     await prisma.userCompany.create({
       data: {
         companyId: company.id,
