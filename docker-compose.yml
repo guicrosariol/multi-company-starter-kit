@@ -1,9 +1,9 @@
 services: 
-  main:
+  multi-company:
     image: bitnami/postgresql
     ports:
      - 5432:5432
     environment:
-    - POSTGRESQL_USERNAME=main
-    - POSTGRESQL_PASSWORD=main
-    - POSTGRESQL_DATABASE=main
+    - POSTGRESQL_USERNAME=multi-company
+    - POSTGRESQL_PASSWORD=multi-company
+    - POSTGRESQL_DATABASE=mamulti-companyin
